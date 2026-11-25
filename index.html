@@ -141,6 +141,23 @@
             z-index: 20;
         }
 
+        /* Manual Smooth Horizontal Slide Rows (Tanpa Auto-Slide) */
+        .manual-slide-row {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            cursor: grab;
+        }
+        .manual-slide-row::-webkit-scrollbar {
+            display: none;
+        }
+        .manual-slide-row:active {
+            cursor: grabbing;
+        }
+
         /* Mobile App Viewport Framing, Smooth Scroll & Anti-Copy / Anti-Zoom */
         html, body {
             overscroll-behavior-y: none;
@@ -300,9 +317,10 @@
     <!-- ==================== 3. FLOATING NAVIGATION & AUDIO CONTROLS ==================== -->
     <nav id="top-nav" class="fixed top-3 left-1/2 -translate-x-1/2 z-30 hidden opacity-0 transition-opacity duration-700 w-[92%] max-w-[395px]">
         <div class="bg-white/85 backdrop-blur-md border border-softblue-200/80 shadow-md shadow-navy-900/5 rounded-full px-4 py-2 flex items-center justify-around text-xs font-medium text-navy-800">
-            <a href="#ucapan" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Ucapan</a>
-            <a href="#surat" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Pesan</a>
-            <a href="#penutup" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Doa</a>
+            <a href="#ucapan" class="px-2.5 py-1 rounded-full active:bg-softblue-100 transition-colors">Ucapan</a>
+            <a href="#kenangan" class="px-2.5 py-1 rounded-full active:bg-softblue-100 transition-colors">Kenangan</a>
+            <a href="#surat" class="px-2.5 py-1 rounded-full active:bg-softblue-100 transition-colors">Pesan</a>
+            <a href="#penutup" class="px-2.5 py-1 rounded-full active:bg-softblue-100 transition-colors">Doa</a>
         </div>
     </nav>
 
@@ -315,95 +333,106 @@
             </svg>
         </button>
 
-        <!-- Music Selector & Toggle Pill -->
-        <div class="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md p-1.5 pl-3 rounded-full shadow-lg shadow-navy-900/15 border border-softblue-200 ml-auto">
-            <!-- Info Lagu Asli YouTube -->
-            <div class="flex items-center gap-1.5 text-left pr-0.5">
-                <svg class="w-3.5 h-3.5 text-softblue-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                </svg>
-                <div class="leading-tight">
-                    <p id="track-title" class="text-[10px] font-bold text-navy-900">Sampai di Sana</p>
-                    <p id="track-subtitle" class="text-[9px] text-softblue-500 font-medium">Lagu Latar</p>
-                </div>
+        <!-- Music Play/Pause Pill -->
+        <button id="music-toggle-btn" onclick="toggleMusic()" aria-label="Putar atau Jeda Musik" class="pointer-events-auto relative flex items-center gap-2 px-3.5 py-2 rounded-full bg-navy-900/95 backdrop-blur-md text-white shadow-lg border border-softblue-300/40 active:scale-95 transition-all cursor-pointer">
+            <span id="music-ping" class="hidden absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-softblue-300 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-softblue-400"></span>
+            </span>
+            <svg id="icon-play" class="w-4 h-4 text-softblue-200" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg id="icon-pause" class="hidden w-4 h-4 text-softblue-200" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+            <div class="text-left leading-tight">
+                <p class="text-[10px] font-semibold tracking-wide">Backsound</p>
+                <p id="track-subtitle" class="text-[9px] text-softblue-200">Lagu Wisuda</p>
             </div>
-
-            <!-- YouTube Player Container (Ukuran memadai namun transparan agar tidak diblokir kebijakan autoplay mobile) -->
-            <div class="fixed bottom-16 right-4 w-[200px] h-[112px] opacity-0 pointer-events-none overflow-hidden -z-10">
-                <div id="youtube-audio-player"></div>
-            </div>
-
-            <!-- Music Toggle Button -->
-            <button id="music-toggle" onclick="toggleMusic()" aria-label="Putar atau Jeda Musik" class="w-9 h-9 rounded-full bg-navy-900 text-white shadow-md flex items-center justify-center transition-all duration-300 active:scale-95 relative shrink-0 cursor-pointer">
-                <span id="music-ping" class="absolute inset-0 rounded-full bg-softblue-400 opacity-30 animate-ping hidden"></span>
-                <svg id="icon-play" class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-                <svg id="icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-            </button>
-        </div>
+        </button>
     </div>
 
-    <!-- ==================== 4. MAIN CONTENT (HALAMAN UTAMA MOBILE) ==================== -->
-    <main id="main-content" class="hidden opacity-0 transition-opacity duration-1000 pt-16 pb-20">
+    <!-- Hidden YouTube Player Container (200x112px behind content for mobile autoplay compatibility) -->
+    <div class="fixed bottom-0 right-0 w-[200px] h-[112px] opacity-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
+        <div id="youtube-audio-player"></div>
+    </div>
 
-        <!-- SECTION A: HALAMAN UCAPAN WISUDA (HERO) -->
-        <section id="ucapan" class="relative px-4 pt-3 pb-10">
-            
-            <!-- Decorative Background Ornaments -->
-            <div class="absolute top-2 left-3 text-softblue-300 animate-float pointer-events-none">
-                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
-            </div>
-            <div class="absolute bottom-8 right-3 text-softblue-300 animate-float-reverse pointer-events-none">
-                <svg class="w-8 h-8 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="12" cy="15" r="6"/>
-                    <path d="M8.5 9.5L6 3h12l-2.5 6.5"/>
-                    <path d="M12 12v3l2 1"/>
-                </svg>
-            </div>
+    <!-- ==================== 4. MAIN CONTENT AREA ==================== -->
+    <main id="main-content" class="hidden opacity-0 transition-opacity duration-1000 pt-14 pb-20 flex-1">
 
-            <!-- Main Greeting Card Container -->
-            <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-5 shadow-lg shadow-softblue-200/50 border border-white text-center relative overflow-hidden">
-                
-                <!-- Subtle Top Ribbon Accent -->
-                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-softblue-200 via-navy-800 to-softblue-200"></div>
+        <!-- SECTION A: UCAPAN SELAMAT WISUDA (LANGSUNG UCAPAN TANPA FOTO WISUDAWAN) -->
+        <section id="ucapan" class="px-4 pt-4 pb-8 reveal active">
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl shadow-navy-900/10 border border-white text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-softblue-300 via-navy-800 to-softblue-300"></div>
 
-                <!-- Header Titles -->
-                <p class="text-[10px] font-bold tracking-[0.22em] uppercase text-softblue-500 mb-1 mt-1">
-                    CONGRATULATIONS!
-                </p>
-                <h2 class="font-serif text-3xl font-bold text-navy-900 tracking-tight mb-4">
-                    Happy Graduation
-                </h2>
-
-                <!-- Decorative Graduation Emblem (Tanpa Foto) -->
-                <div class="relative w-16 h-16 mx-auto mb-4 rounded-full bg-softblue-50 border border-softblue-200 flex items-center justify-center text-navy-900 shadow-sm">
-                    <svg class="w-8 h-8 text-navy-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <!-- Graduation Cap Badge -->
+                <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-softblue-50 border border-softblue-200 flex items-center justify-center text-navy-900 shadow-sm">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                         <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
                         <path d="M6 12v5c3 3 9 3 12 0v-5"/>
                     </svg>
                 </div>
 
-                <!-- Graduate Name & Program Studi -->
-                <div class="mb-4">
-                    <h3 class="font-serif text-2xl font-bold text-navy-900">
-                        Silvi Wulandari, S.M.
-                    </h3>
-                    <p class="text-[11px] font-semibold tracking-widest uppercase text-softblue-500 mt-1">
-                        Program Studi Manajemen • 25 November 2026
+                <span class="inline-block px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase text-softblue-500 bg-softblue-50 rounded-full border border-softblue-100">
+                    Happy Graduation
+                </span>
+
+                <h1 class="font-serif text-3xl font-bold text-navy-900 mt-2 leading-tight">
+                    Silvi Wulandari, S.M
+                </h1>
+                <p class="text-[11px] font-semibold tracking-wider uppercase text-navy-800/60 mt-0.5">
+                    Bachelor of Management &bull; Class of 2026
+                </p>
+
+                <div class="w-12 h-0.5 bg-softblue-200 mx-auto my-4 rounded-full"></div>
+
+                <div class="space-y-3 text-navy-800/90 text-xs leading-relaxed text-center">
+                    <p>
+                        Selamat atas pencapaian luar biasa hari ini! Setiap lelah, doa, begadang, dan air mata selama menyusun skripsi akhirnya terbayar lunas dengan gelar <strong class="text-navy-900 font-semibold">Sarjana Manajemen (S.M)</strong>.
+                    </p>
+                    <p>
+                        Terima kasih sudah menjadi pribadi yang kuat, sabar, dan tidak pernah menyerah meski jalan yang dilalui tidak selalu mudah. Aku bangga sekali dengan setiap langkah yang berhasil kamu taklukkan.
                     </p>
                 </div>
 
-                <!-- Heartfelt Message -->
-                <div class="bg-softblue-50/80 rounded-2xl p-4 border border-softblue-100 text-left">
-                    <p class="text-navy-800/90 text-xs leading-relaxed">
-                        "Selamat atas pencapaian luar biasa ini. Akhirnya, perjalanan panjang yang penuh perjuangan, doa, air mata, dan pengorbanan berhasil kamu lewati. Hari ini bukan sekadar tentang gelar yang berhasil diraih, tetapi tentang proses panjang yang telah membentukmu menjadi pribadi yang lebih kuat dan hebat. Semoga ilmu yang didapat menjadi berkah dan bermanfaat, serta menjadi awal dari perjalanan baru yang jauh lebih indah. Teruslah melangkah, karena masih banyak impian yang menantimu. <span class="font-semibold text-navy-900 italic">We're so proud of you!</span>"
-                    </p>
-                    <p class="text-[11px] font-semibold text-navy-900 text-right mt-2.5">
-                        — Dari Irwansyah • 25 November 2026
-                    </p>
+                <div class="mt-5 pt-3.5 border-t border-softblue-100 flex flex-col items-center">
+                    <p class="text-xs font-bold text-navy-900">Dari Irwansyah</p>
+                    <p class="text-[10px] font-medium text-softblue-500 mt-0.5">25 November 2026</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION B: GALERI SLIDE FOTO KENANGAN (3 BARIS SLIDE BANYAK FOTO TANPA TEKS KETERANGAN) -->
+        <section id="kenangan" class="px-4 py-8 reveal">
+            <div class="text-center mb-5">
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-softblue-500">Our Journey</span>
+                <h2 class="font-serif text-2xl font-bold text-navy-900 mt-0.5">Momen Kenangan Bersama</h2>
+            </div>
+
+            <!-- Pemilih Foto Cadangan Jika Dibuka di Lingkungan Preview Terisolasi -->
+            <div id="photo-loader-bar" class="mb-4 text-center">
+                <label for="collage-file-input" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-navy-900 text-[11px] font-semibold border border-softblue-200 shadow-sm active:scale-95 transition-all cursor-pointer">
+                    <svg class="w-3.5 h-3.5 text-softblue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Pilih Foto Kenangan dari Galeri HP</span>
+                </label>
+                <input id="collage-file-input" type="file" accept="image/*" multiple class="hidden" onchange="handleCollageUpload(event)">
+            </div>
+
+            <!-- Bingkai Kolase 3 Baris Slide Manual Smooth & Bisa Diketuk -->
+            <div class="relative bg-white/90 backdrop-blur-md p-2.5 rounded-3xl shadow-lg shadow-navy-900/10 border border-white space-y-2.5 overflow-hidden">
+                <!-- Baris 1 -->
+                <div class="w-full overflow-hidden rounded-2xl">
+                    <div id="collage-row-1" class="manual-slide-row"></div>
+                </div>
+                <!-- Baris 2 -->
+                <div class="w-full overflow-hidden rounded-2xl">
+                    <div id="collage-row-2" class="manual-slide-row"></div>
+                </div>
+                <!-- Baris 3 -->
+                <div class="w-full overflow-hidden rounded-2xl">
+                    <div id="collage-row-3" class="manual-slide-row"></div>
                 </div>
             </div>
         </section>
@@ -455,28 +484,55 @@
                 </div>
 
                 <!-- Expanded Full Letter Modal/Card -->
-                <div id="full-letter" class="hidden opacity-0 translate-y-6 transition-all duration-700 mt-5 bg-white rounded-3xl p-5 shadow-xl shadow-navy-900/10 border border-softblue-200 relative">
-                    <div class="flex items-center justify-between border-b border-softblue-100 pb-3 mb-3">
-                        <span class="font-serif italic text-base text-navy-900 font-semibold">Dear Silvi Wulandari, S.M.</span>
-                        <button onclick="toggleEnvelope()" class="text-[11px] font-medium text-softblue-500 active:text-navy-900 px-2.5 py-1 rounded-full bg-softblue-50">
+                <div id="full-letter" class="hidden opacity-0 translate-y-6 transition-all duration-700 mt-5 bg-white rounded-3xl p-5 shadow-xl shadow-navy-900/10 border border-softblue-200 relative text-left">
+                    <div class="flex items-start justify-between gap-2 border-b border-softblue-100 pb-3 mb-4">
+                        <div>
+                            <p class="font-serif text-base text-navy-900 font-bold leading-snug">Selamat Atas Gelar Wisudanya, Sayangku. ❤️</p>
+                            <p class="text-xs font-bold text-softblue-500 mt-0.5">Silvi Wulandari, S.M.</p>
+                        </div>
+                        <button onclick="toggleEnvelope()" class="shrink-0 text-[11px] font-medium text-softblue-500 active:text-navy-900 px-2.5 py-1 rounded-full bg-softblue-50">
                             Tutup Surat
                         </button>
                     </div>
-                    <div class="space-y-3 text-navy-800/90 text-xs leading-relaxed">
+                    <div class="space-y-3.5 text-navy-800/90 text-xs leading-relaxed">
                         <p>
-                            Jika suatu hari nanti kamu merasa lelah dengan langkah yang sedang kamu tempuh, ingatlah kembali hari ini—hari di mana kamu membuktikan bahwa tidak ada usaha yang mengkhianati hasil.
+                            Hari ini, akhirnya kamu sampai juga di titik yang selama ini kita perjuangkan. Hari ketika namamu dipanggil, toga dikenakan, dan sebuah gelar berhasil kamu raih. Mungkin bagi sebagian orang, wisuda hanyalah sebuah seremoni, sebuah perayaan atas selesainya masa perkuliahan. Namun, bagiku, hari ini jauh lebih dari itu. Hari ini adalah bukti bahwa seorang perempuan hebat telah berhasil melewati begitu banyak hal yang tidak semua orang tahu.
                         </p>
                         <p>
-                            Begitu banyak malam yang kamu habiskan untuk bertahan, begitu banyak keraguan yang berhasil kamu kalahkan dengan doa dan ketekunan selama menyusun skripsi. Kamu layak mendapatkan segala kebahagiaan dan apresiasi atas pencapaian gelar Sarjana Manajemen ini.
+                            Silvi, kalau saja perjalananmu bisa diceritakan dalam satu tulisan, mungkin tidak akan cukup satu halaman untuk menggambarkan semuanya. Ada begitu banyak cerita di balik gelar yang hari ini kamu sandang. Ada tawa yang pernah kita rayakan, ada tangis yang diam-diam kamu sembunyikan, ada lelah yang terkadang membuatmu ingin menyerah, ada hari-hari ketika semuanya terasa begitu berat. Bahkan, ada saat ketika perjuanganmu harus terhenti sejenak karena kamu harus berjuang untuk kesehatanmu di rumah sakit. Tetapi lihatlah sekarang, kamu berhasil melewati semuanya. Kamu masih berdiri di sini, dengan segala luka, cerita, dan perjuangan yang akhirnya mengantarkanmu pada hari yang begitu indah ini.
                         </p>
                         <p>
-                            Semoga babak baru kehidupanmu setelah wisuda ini selalu dipenuhi pintu-pintu kesempatan yang baik, orang-orang yang tulus menyayangimu, dan kebahagiaan yang tidak pernah putus.
+                            Aku tahu, perjalananmu tidak selalu mudah. Ada banyak hal yang mungkin tidak bisa diungkapkan dengan kata-kata. Ada malam-malam penuh pikiran, ada air mata yang jatuh karena keadaan, ada rasa takut, kecewa, dan lelah yang mungkin hanya kamu sendiri yang benar-benar mengerti. Namun, satu hal yang perlu kamu tahu, aku adalah salah satu saksi dari perjalanan panjang itu. Aku melihat bagaimana kamu berusaha, bagaimana kamu bertahan, dan bagaimana kamu terus melangkah meskipun keadaan terkadang tidak berpihak kepadamu.
+                        </p>
+                        <p>
+                            Selama perjalanan itu, aku mungkin tidak selalu bisa menghilangkan lelahmu, tidak selalu mampu menghapus air matamu, dan tidak selalu punya jawaban atas semua kesulitan yang kamu hadapi. Tetapi percayalah, aku selalu ingin menjadi seseorang yang ada di sampingmu. Aku selalu berusaha mendukungmu dan mengupayakan berbagai cara agar kamu bisa melewati semuanya. Bukan karena aku mengharapkan sesuatu sebagai balasannya, melainkan karena aku ingin melihatmu sampai pada hari ini. Hari ketika segala usaha dan pengorbananmu akhirnya memiliki cerita yang begitu indah untuk dikenang. Jika hari ini aku bisa ikut tersenyum melihat keberhasilanmu, percayalah, ada begitu banyak doa, harapan, dan kebahagiaan yang selama ini aku simpan untukmu.
+                        </p>
+                        <p>
+                            Namun, jangan pernah lupa bahwa di balik keberhasilanmu hari ini, ada doa yang tidak pernah putus dari kedua orang tuamu. Ada keringat, pengorbanan, kesabaran, dan perjuangan keluarga yang mungkin tidak semuanya pernah kamu lihat. Mereka adalah orang-orang yang turut mengantarkanmu sampai ke titik ini, yang mungkin diam-diam menahan lelah demi melihatmu berhasil. Gelar ini bukan hanya milikmu, tetapi juga menjadi kebahagiaan dan kebanggaan bagi mereka yang selama ini tidak pernah berhenti mendoakan dan memperjuangkanmu. Jangan pernah lupa, ada begitu banyak cinta yang mengiringi setiap langkahmu hingga hari ini.
+                        </p>
+                        <p>
+                            Akhirnya, perjuangan panjang itu sampai juga pada sebuah perayaan. Hari ini, kamu tidak hanya merayakan keberhasilan mendapatkan gelar sarjana, tetapi juga merayakan dirimu sendiri yang telah berhasil bertahan dari begitu banyak hal. Aku harap, ketika suatu hari nanti kamu melihat kembali foto wisuda ini, kamu tidak hanya mengingat betapa indahnya hari ini, tetapi juga mengingat betapa kuatnya dirimu ketika melewati hari-hari yang sulit untuk sampai ke sini.
+                        </p>
+                        <p>
+                            Teruslah tumbuh, teruslah bermimpi, dan jangan pernah berhenti menjadi perempuan hebat yang aku kenal. Semoga gelar ini menjadi awal dari perjalanan yang jauh lebih indah. Semoga setiap langkahmu ke depan selalu dimudahkan, setiap cita-citamu didekatkan, dan setiap doa baik yang selama ini kamu panjatkan satu per satu menemukan jalannya untuk menjadi kenyataan.
+                        </p>
+                        <p>
+                            Terima kasih sudah bertahan sejauh ini. Terima kasih sudah tidak menyerah pada keadaan. Dan terima kasih sudah memberikan kesempatan kepadaku untuk menjadi bagian dari perjalanan panjangmu.
+                        </p>
+                        <p class="font-semibold text-navy-900 bg-softblue-50/90 p-3.5 rounded-2xl border border-softblue-100">
+                            Hari ini, aku bangga bukan hanya karena kamu berhasil menjadi seorang sarjana, tetapi karena aku tahu betapa berat perjuangan yang harus kamu lalui untuk sampai ke sini.
+                        </p>
+                        <p>
+                            Jika boleh mengulang waktu, aku tetap ingin menjadi seseorang yang menemanimu melewati perjalanan itu. Sebab, melihatmu bahagia dan berhasil seperti hari ini adalah salah satu hal yang juga menjadi kebahagiaanku.
+                        </p>
+                        <p>
+                            Sekali lagi, selamat atas gelar sarjanamu, perempuan hebat. Jangan pernah merasa bahwa semua perjuanganmu sia-sia, karena hari ini adalah bukti bahwa kamu mampu melewati hal-hal yang dahulu mungkin terasa mustahil.
                         </p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-softblue-100 text-right">
-                        <p class="font-serif italic text-navy-900 text-sm">Dengan penuh rasa bangga & sayang,</p>
-                        <p class="text-xs font-semibold text-navy-900 mt-0.5">Dari Irwansyah</p>
-                        <p class="text-[11px] font-medium text-softblue-500 mt-0.5">25 November 2026</p>
+                    <div class="mt-5 pt-3.5 border-t border-softblue-100 text-right">
+                        <p class="text-[11px] font-bold text-navy-900">25 November 2026</p>
+                        <p class="text-xs font-bold text-softblue-500 mt-1">With Love, Abuyyyy ❤️</p>
+                        <p class="font-serif italic text-navy-900 text-sm mt-0.5">Irwansyah</p>
                     </div>
                 </div>
 
@@ -522,6 +578,16 @@
         </footer>
 
     </main>
+
+    <!-- LIGHTBOX MODAL (TANPA TEKS KETERANGAN) -->
+    <div id="photo-lightbox" onclick="closeLightbox()" class="fixed inset-0 z-50 mx-auto max-w-[430px] hidden opacity-0 transition-opacity duration-300 bg-navy-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <button onclick="closeLightbox()" aria-label="Tutup Foto" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" class="max-w-full max-h-[82dvh] rounded-2xl shadow-2xl object-contain">
+    </div>
 
     </div> <!-- End of #mobile-app-shell -->
 
@@ -600,64 +666,74 @@
                         }
                     },
                     onError: function() {
-                        document.getElementById('track-subtitle').textContent = 'Ketuk tombol play';
+                        const sub = document.getElementById('track-subtitle');
+                        if (sub) sub.textContent = 'Ketuk tombol play';
                     }
                 }
             });
         }
 
-        window.onYouTubeIframeAPIReady = function() {
-            createYouTubePlayer();
-        };
-
-        if (typeof YT !== 'undefined' && YT.Player) {
+        function onYouTubeIframeAPIReady() {
             createYouTubePlayer();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof YT !== 'undefined' && YT.Player) {
+                createYouTubePlayer();
+            }
+            initSlideGallery();
+            loadSavedCollagePhotos();
+        });
 
         function initAndPlayMusic() {
             hasUserInteracted = true;
-            createYouTubePlayer();
-            if (isYtReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
-                ytPlayer.unMute();
-                ytPlayer.setVolume(100);
-                ytPlayer.playVideo();
-                isMusicPlaying = true;
-                updateMusicUI();
+            if (!ytPlayer && typeof YT !== 'undefined' && YT.Player) {
+                createYouTubePlayer();
+            }
+            if (ytPlayer && isYtReady) {
+                try {
+                    ytPlayer.unMute();
+                    ytPlayer.setVolume(100);
+                    ytPlayer.playVideo();
+                    isMusicPlaying = true;
+                    updateMusicUI();
+                } catch (e) {}
             }
         }
 
-        // Otomatis nyalakan suara pada sentuhan/klik pertama di mana saja pada layar HP
-        ['touchstart', 'click'].forEach(evt => {
-            document.addEventListener(evt, function unlockAudioOnFirstGesture() {
+        function toggleMusic() {
+            if (!ytPlayer || !isYtReady) {
+                initAndPlayMusic();
+                return;
+            }
+            try {
+                if (isMusicPlaying) {
+                    ytPlayer.pauseVideo();
+                    isMusicPlaying = false;
+                } else {
+                    ytPlayer.unMute();
+                    ytPlayer.setVolume(100);
+                    ytPlayer.playVideo();
+                    isMusicPlaying = true;
+                }
+                updateMusicUI();
+            } catch (e) {}
+        }
+
+        // Buka kunci audio otomatis pada sentuhan pertama di layar HP
+        ['touchstart', 'click'].forEach((evt) => {
+            document.addEventListener(evt, function unlockAudioOnce() {
                 if (!hasUserInteracted) {
                     initAndPlayMusic();
                 }
             }, { once: true, passive: true });
         });
 
-        function toggleMusic() {
-            hasUserInteracted = true;
-            if (!isYtReady || !ytPlayer) {
-                createYouTubePlayer();
-                return;
-            }
-
-            if (!isMusicPlaying || ytPlayer.isMuted()) {
-                ytPlayer.unMute();
-                ytPlayer.setVolume(100);
-                ytPlayer.playVideo();
-                isMusicPlaying = true;
-            } else {
-                ytPlayer.pauseVideo();
-                isMusicPlaying = false;
-            }
-            updateMusicUI();
-        }
-
         function updateMusicUI() {
             const iconPlay = document.getElementById('icon-play');
             const iconPause = document.getElementById('icon-pause');
             const musicPing = document.getElementById('music-ping');
+            if (!iconPlay || !iconPause || !musicPing) return;
 
             if (isMusicPlaying) {
                 iconPlay.classList.add('hidden');
@@ -670,68 +746,28 @@
             }
         }
 
-        // --- 3. CONFETTI CELEBRATION ---
-        function fireCelebrationConfetti() {
-            if (typeof confetti === 'undefined') return;
-            
-            const colors = ['#0F2542', '#4A96D4', '#A3CEEE', '#FFFFFF', '#F59E0B'];
-            
-            confetti({
-                particleCount: 75,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: colors
-            });
-
-            setTimeout(() => {
-                confetti({
-                    particleCount: 45,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0.1, y: 0.65 },
-                    colors: colors
-                });
-                confetti({
-                    particleCount: 45,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 0.9, y: 0.65 },
-                    colors: colors
-                });
-            }, 250);
-        }
-
-        // --- 4. TRANSITION FROM WELCOME ENVELOPE -> ROMANTIC GREETING POPUP -> MAIN CONTENT ---
-        let isGreetingOpened = false;
+        // --- 3. WELCOME ENVELOPE & POPUP FLOW ---
         function openGreeting() {
-            if (isGreetingOpened) return;
-            isGreetingOpened = true;
-
-            // Mulai musik latar setelah interaksi klik pengguna
             initAndPlayMusic();
 
             const welcomeEnvelope = document.getElementById('welcome-envelope');
-            const welcomeSeal = document.getElementById('welcome-seal');
             const romanticPopup = document.getElementById('romantic-popup');
             const romanticCard = document.getElementById('romantic-card');
-            const floatingControls = document.getElementById('floating-controls');
 
-            // 1. Animasi membuka tutup amplop terlebih dahulu
-            welcomeEnvelope.classList.add('envelope-open');
-            welcomeSeal.classList.add('opacity-0', 'scale-50');
+            if (welcomeEnvelope) {
+                welcomeEnvelope.classList.add('envelope-open');
+            }
 
-            // 2. Tampilkan kartu ucapan romantis & tombol ganti lagu setelah amplop terbuka
+            fireCelebrationConfetti();
+
             setTimeout(() => {
-                romanticPopup.classList.remove('hidden');
-                floatingControls.classList.remove('hidden');
-
-                setTimeout(() => {
-                    romanticPopup.classList.remove('opacity-0');
-                    romanticCard.classList.remove('scale-95');
-                    romanticCard.classList.add('scale-100');
-                    floatingControls.classList.remove('opacity-0');
-                    fireCelebrationConfetti();
-                }, 40);
+                if (romanticPopup) {
+                    romanticPopup.classList.remove('hidden');
+                    setTimeout(() => {
+                        romanticPopup.classList.remove('opacity-0');
+                        if (romanticCard) romanticCard.classList.remove('scale-95');
+                    }, 30);
+                }
             }, 650);
         }
 
@@ -742,117 +778,258 @@
             const romanticPopup = document.getElementById('romantic-popup');
             const mainContent = document.getElementById('main-content');
             const topNav = document.getElementById('top-nav');
+            const floatingControls = document.getElementById('floating-controls');
 
-            romanticPopup.classList.add('opacity-0');
-            welcomeScreen.classList.add('opacity-0', '-translate-y-6');
+            if (romanticPopup) romanticPopup.classList.add('opacity-0');
+            if (welcomeScreen) welcomeScreen.classList.add('opacity-0', '-translate-y-6');
 
             setTimeout(() => {
-                romanticPopup.classList.add('hidden');
-                welcomeScreen.style.display = 'none';
-                mainContent.classList.remove('hidden');
-                topNav.classList.remove('hidden');
+                if (romanticPopup) romanticPopup.classList.add('hidden');
+                if (welcomeScreen) welcomeScreen.style.display = 'none';
+                if (mainContent) mainContent.classList.remove('hidden');
+                if (topNav) topNav.classList.remove('hidden');
+                if (floatingControls) floatingControls.classList.remove('hidden');
 
                 setTimeout(() => {
-                    mainContent.classList.remove('opacity-0');
-                    topNav.classList.remove('opacity-0');
+                    if (mainContent) mainContent.classList.remove('opacity-0');
+                    if (topNav) topNav.classList.remove('opacity-0');
+                    if (floatingControls) floatingControls.classList.remove('opacity-0');
                     fireCelebrationConfetti();
                     checkReveal();
                 }, 50);
             }, 600);
         }
 
-        // --- 5. INTERACTIVE PERSONAL LETTER ENVELOPE ---
+        // --- 4. 3-ROW SLIDE COLLAGE GALLERY ---
+        const DEFAULT_COLLAGE_PHOTOS = [
+            'WhatsApp Image 2026-11-24 at 23.00.48 (1).jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.48.jpeg',
+            'WhatsApp Image 2026-11-24 at 22.35.07.jpg',
+            'WhatsApp Image 2026-11-24 at 23.00.50.jpeg',
+            'WhatsApp Image 2026-11-24 at 22.34.48.jpg',
+            'WhatsApp Image 2026-11-24 at 23.00.49.jpeg',
+            'WhatsApp Image 2026-11-24 at 22.34.48 (1).jpg',
+            'WhatsApp Image 2026-11-24 at 23.00.49 (2).jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.49 (1).jpeg',
+            'WhatsApp Image 2026-11-24 at 22.34.47 (1).jpg',
+            'WhatsApp Image 2026-11-24 at 22.34.47.jpeg',
+            'WhatsApp Image 2026-11-24 at 22.35.07 (1).jpg',
+            'WhatsApp Image 2026-11-24 at 23.00.47 (3).jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.47 (2).jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.47 (1).jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.47.jpeg',
+            'WhatsApp Image 2026-11-24 at 23.00.46.jpeg'
+        ];
+        let activeCollagePhotos = [...DEFAULT_COLLAGE_PHOTOS];
+
+        function initSlideGallery() {
+            const row1 = document.getElementById('collage-row-1');
+            const row2 = document.getElementById('collage-row-2');
+            const row3 = document.getElementById('collage-row-3');
+            if (!row1 || !row2 || !row3) return;
+
+            const rowsData = [
+                activeCollagePhotos.filter((_, idx) => idx % 3 === 0),
+                activeCollagePhotos.filter((_, idx) => idx % 3 === 1),
+                activeCollagePhotos.filter((_, idx) => idx % 3 === 2)
+            ];
+
+            [row1, row2, row3].forEach((rowEl, rIdx) => {
+                const items = rowsData[rIdx].length ? rowsData[rIdx] : activeCollagePhotos;
+                rowEl.innerHTML = items.map((src) => `
+                    <div onclick="handleSlideItemClick(event, this.querySelector('img').src)" class="w-28 h-36 shrink-0 rounded-xl overflow-hidden bg-softblue-100 border border-softblue-100 shadow-sm cursor-pointer active:scale-95 transition-transform">
+                        <img src="${src}" alt="" class="w-full h-full object-cover">
+                    </div>
+                `).join('');
+                enableSmoothDragScroll(rowEl);
+            });
+        }
+
+        let isDraggingSlide = false;
+        let hasDraggedDistance = false;
+
+        // Mengaktifkan geser halus menggunakan mouse maupun sentuhan jari pada setiap baris slide
+        function enableSmoothDragScroll(container) {
+            if (!container || container.dataset.dragBound === 'true') return;
+            container.dataset.dragBound = 'true';
+
+            let isDown = false;
+            let startX = 0;
+            let scrollLeftStart = 0;
+
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                isDraggingSlide = true;
+                hasDraggedDistance = false;
+                startX = e.pageX - container.offsetLeft;
+                scrollLeftStart = container.scrollLeft;
+                container.style.scrollBehavior = 'auto';
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (!isDown) return;
+                isDown = false;
+                container.style.scrollBehavior = 'smooth';
+                setTimeout(() => {
+                    isDraggingSlide = false;
+                }, 50);
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 1.35;
+                if (Math.abs(walk) > 6) {
+                    hasDraggedDistance = true;
+                }
+                container.scrollLeft = scrollLeftStart - walk;
+            });
+
+            container.addEventListener('touchstart', (e) => {
+                if (!e.touches.length) return;
+                startX = e.touches[0].pageX;
+                hasDraggedDistance = false;
+                container.style.scrollBehavior = 'smooth';
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!e.touches.length) return;
+                if (Math.abs(e.touches[0].pageX - startX) > 6) {
+                    hasDraggedDistance = true;
+                }
+            }, { passive: true });
+        }
+
+        // Membuka foto di lightbox hanya jika pengguna mengetuk tanpa menyeret slide
+        function handleSlideItemClick(event, src) {
+            if (isDraggingSlide || hasDraggedDistance) {
+                event.preventDefault();
+                return;
+            }
+            openLightboxSrc(src);
+        }
+
+        // --- 5. UPLOAD & LOCALSTORAGE PHOTO PERSISTENCE ---
+        function handleCollageUpload(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            const uploadedPhotos = [];
+            let loadedCount = 0;
+
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos[idx] = e.target.result;
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        activeCollagePhotos = uploadedPhotos.filter(Boolean);
+                        initSlideGallery();
+                        try {
+                            localStorage.setItem(STORAGE_COLLAGE_KEY, JSON.stringify(activeCollagePhotos));
+                        } catch (err) {}
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function loadSavedCollagePhotos() {
+            try {
+                const raw = localStorage.getItem(STORAGE_COLLAGE_KEY);
+                if (!raw) return;
+                const photos = JSON.parse(raw);
+                if (Array.isArray(photos) && photos.filter(Boolean).length > 0) {
+                    activeCollagePhotos = photos.filter(Boolean);
+                    initSlideGallery();
+                }
+            } catch (e) {}
+        }
+
+        // --- 6. LIGHTBOX MODAL ---
+        function openLightboxSrc(src) {
+            const modal = document.getElementById('photo-lightbox');
+            const modalImg = document.getElementById('lightbox-img');
+            if (!src || !modal || !modalImg) return;
+
+            modalImg.src = src;
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 20);
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('photo-lightbox');
+            if (!modal) return;
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // --- 7. PERSONAL ENVELOPE LETTER TOGGLE ---
         let isEnvelopeOpen = false;
         function toggleEnvelope() {
             const box = document.getElementById('envelope-box');
             const letter = document.getElementById('full-letter');
             const hint = document.getElementById('envelope-hint');
-            const seal = document.getElementById('wax-seal');
+            if (!box || !letter) return;
 
             isEnvelopeOpen = !isEnvelopeOpen;
-
             if (isEnvelopeOpen) {
                 box.classList.add('envelope-open');
-                seal.classList.add('scale-0', 'opacity-0');
-                hint.textContent = 'Surat terbuka — Selamat membaca!';
-
                 letter.classList.remove('hidden');
                 setTimeout(() => {
                     letter.classList.remove('opacity-0', 'translate-y-6');
-                    letter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 250);
+                }, 40);
+                if (hint) hint.textContent = 'Ketuk tombol "Tutup Surat" untuk melipat kembali';
+                fireCelebrationConfetti();
             } else {
-                box.classList.remove('envelope-open');
-                seal.classList.remove('scale-0', 'opacity-0');
-                hint.textContent = 'Ketuk amplop di bawah ini untuk membuka surat';
-
                 letter.classList.add('opacity-0', 'translate-y-6');
                 setTimeout(() => {
                     letter.classList.add('hidden');
-                }, 500);
+                    box.classList.remove('envelope-open');
+                }, 350);
+                if (hint) hint.textContent = 'Ketuk amplop di bawah ini untuk membuka surat';
             }
         }
 
-        // --- 6. SCROLL REVEAL & BACK TO TOP ---
+        // --- 8. CONFETTI, SCROLL REVEAL & BACK TO TOP ---
+        function fireCelebrationConfetti() {
+            if (typeof confetti !== 'function') return;
+            try {
+                confetti({
+                    particleCount: 65,
+                    spread: 70,
+                    origin: { y: 0.65 },
+                    colors: ['#1E3A5F', '#4A96D4', '#A3CEEE', '#FFFFFF']
+                });
+            } catch (e) {}
+        }
+
         function checkReveal() {
             const reveals = document.querySelectorAll('.reveal');
             const windowHeight = window.innerHeight;
-
-            reveals.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                if (elementTop < windowHeight - 80) {
+            reveals.forEach((el) => {
+                const top = el.getBoundingClientRect().top;
+                if (top < windowHeight - 40) {
                     el.classList.add('active');
                 }
             });
 
-            // Back to top button visibility
-            const backToTopBtn = document.getElementById('back-to-top');
-            if (window.scrollY > 350) {
-                backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
-            } else {
-                backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+            const backBtn = document.getElementById('back-to-top');
+            if (backBtn) {
+                if (window.scrollY > 260) {
+                    backBtn.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    backBtn.classList.add('opacity-0', 'pointer-events-none');
+                }
             }
         }
-
-        window.addEventListener('scroll', checkReveal);
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- 8. PROTEKSI ANTI-ZOOM & ANTI-COPY UNTUK PENGALAMAN APLIKASI MOBILE YANG HALUS ---
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault();
-        }, { passive: false });
-
-        document.addEventListener('gesturechange', function (e) {
-            e.preventDefault();
-        }, { passive: false });
-
-        document.addEventListener('gestureend', function (e) {
-            e.preventDefault();
-        }, { passive: false });
-
-        document.addEventListener('touchmove', function (e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (e) {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, { passive: false });
-
-        document.addEventListener('keydown', function (e) {
-            if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 'u', 's', '+', '-', '='].includes(e.key.toLowerCase())) {
-                e.preventDefault();
-            }
-        });
+        window.addEventListener('scroll', checkReveal, { passive: true });
     </script>
 </body>
 </html>
