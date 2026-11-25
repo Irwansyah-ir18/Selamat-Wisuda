@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Graduation - A Special Day for You</title>
+    
+    <!-- Google Fonts: Cormorant Garamond (Elegan) & Plus Jakarta Sans (Modern & Bersih) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- YouTube IFrame Player API untuk Memutar Lagu Asli dari YouTube -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // Simpan & muat foto secara otomatis agar tidak hilang saat halaman dibuka ulang di HP
+        const STORAGE_HERO_KEY = 'silvi_grad_hero_photo_v1';
+        const STORAGE_COLLAGE_KEY = 'silvi_grad_collage_photos_v1';
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1E3A5F',
+                            900: '#0F2542',
+                            950: '#09172B',
+                        },
+                        softblue: {
+                            50: '#F4F9FD',
+                            100: '#E6F2FA',
+                            200: '#CCE3F5',
+                            300: '#A3CEEE',
+                            400: '#75B4E3',
+                            500: '#4A96D4',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Animations & Keyframes */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+        @keyframes floatReverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(10px) rotate(-2deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 150, 212, 0.4); }
+            50% { box-shadow: 0 0 0 14px rgba(74, 150, 212, 0); }
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .animate-float {
+            animation: floatSlow 5s ease-in-out infinite;
+        }
+        .animate-float-reverse {
+            animation: floatReverse 6s ease-in-out infinite;
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2.5s infinite;
+        }
+        .animate-sparkle {
+            animation: sparkle 3s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3D Interactive Envelope Styles */
+        .envelope-wrapper {
+            perspective: 1200px;
+        }
+        .envelope-flap {
+            transform-origin: top;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.3s ease;
+        }
+        .envelope-open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+        .letter-card {
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+        }
+        .envelope-open .letter-card {
+            transform: translateY(-45px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4F9FD;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A3CEEE;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1E3A5F;
+        }
+
+        /* Polaroid Card Hover */
+        .polaroid-card {
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+            will-change: transform;
+        }
+        .polaroid-card:hover {
+            transform: translateY(-6px) scale(1.02) rotate(0deg) !important;
+            box-shadow: 0 16px 28px -8px rgba(15, 37, 66, 0.15);
+            z-index: 20;
+        }
+
+        /* Mobile App Viewport Framing, Smooth Scroll & Anti-Copy / Anti-Zoom */
+        html, body {
+            overscroll-behavior-y: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            scroll-behavior: smooth;
+        }
+
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        img {
+            pointer-events: none;
+            -webkit-user-drag: none;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onselectstart="return false;" class="bg-softblue-100/80 text-navy-900 font-sans antialiased overflow-x-hidden flex justify-center min-h-[100dvh]">
+
+    <!-- Mobile App Container Wrapper (Memastikan tampilan selalu proporsional ukuran layar HP) -->
+    <div id="mobile-app-shell" class="relative w-full max-w-[430px] min-h-[100dvh] bg-gradient-to-b from-white via-softblue-50 to-softblue-100 shadow-2xl shadow-navy-900/15 overflow-x-hidden flex flex-col">
+
+    <!-- ==================== 1. LOADING OVERLAY ==================== -->
+    <div id="loader" class="fixed inset-0 z-50 mx-auto max-w-[430px] flex flex-col items-center justify-center bg-white transition-opacity duration-700">
+        <div class="relative w-14 h-14 flex items-center justify-center">
+            <div class="absolute inset-0 border-4 border-softblue-100 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-navy-800 rounded-full border-t-transparent animate-spin"></div>
+            <!-- Mini Graduation Cap Icon -->
+            <svg class="w-6 h-6 text-navy-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+        </div>
+        <p class="mt-3 text-xs font-medium tracking-widest uppercase text-navy-800/70 animate-pulse">Menyiapkan Kejutan...</p>
+    </div>
+
+    <!-- ==================== 2. WELCOME SCREEN (AMPLOP PEMBUKA INTERAKTIF) ==================== -->
+    <section id="welcome-screen" class="fixed inset-0 z-40 mx-auto max-w-[430px] flex flex-col items-center justify-center min-h-[100dvh] px-5 py-6 bg-gradient-to-br from-white via-softblue-50 to-softblue-200 transition-all duration-1000 ease-in-out overflow-hidden">
+        
+        <!-- Decorative Floating Elements -->
+        <div class="absolute top-8 left-5 text-softblue-400 animate-float pointer-events-none opacity-70">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+        </div>
+        <div class="absolute bottom-10 right-5 text-navy-800/20 animate-float-reverse pointer-events-none">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+        </div>
+
+        <!-- Main Welcome Content -->
+        <div class="w-full text-center flex flex-col items-center relative z-10">
+            
+            <!-- Badge -->
+            <span class="inline-block px-3 py-1 mb-2.5 text-[10px] font-semibold tracking-[0.2em] uppercase text-navy-800 bg-white/90 rounded-full shadow-sm border border-softblue-200">
+                Special Graduation Card
+            </span>
+
+            <!-- Main Heading -->
+            <h1 class="font-serif text-3xl font-bold text-navy-900 leading-tight mb-1.5">
+                A Special Day for You!
+            </h1>
+
+            <!-- Subtitle -->
+            <div class="text-navy-800/75 text-xs font-normal leading-relaxed mb-6 px-2">
+                <p>sebuah ucapan spesial teruntuk</p>
+                <p class="font-serif text-xl font-bold text-navy-900 mt-0.5">Silvi Wulandari, S.M</p>
+            </div>
+
+            <!-- Interactive Opening Envelope (Klik untuk membuka undangan/ucapan) -->
+            <div id="welcome-envelope" onclick="openGreeting()" role="button" tabindex="0" aria-label="Buka Amplop Ucapan Wisuda"
+                 class="envelope-wrapper relative w-full max-w-[290px] h-48 bg-softblue-200 rounded-2xl shadow-xl shadow-navy-900/15 border border-white cursor-pointer flex items-center justify-center transition-transform duration-300 active:scale-95">
+                
+                <!-- Inner Back -->
+                <div class="absolute inset-0 bg-softblue-300/60 rounded-2xl"></div>
+
+                <!-- Card Inside Peeking Out -->
+                <div class="letter-card relative z-10 w-[86%] h-[80%] bg-white rounded-xl shadow-sm p-3.5 flex flex-col items-center justify-center text-center border border-softblue-100">
+                    <!-- Mini Toga Icon -->
+                    <svg class="w-6 h-6 text-navy-800 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                    <p class="font-serif text-base font-bold text-navy-900 leading-snug">Silvi Wulandari, S.M.</p>
+                    <p class="text-[10px] text-softblue-500 font-medium mt-0.5">Program Studi Manajemen</p>
+                </div>
+
+                <!-- Envelope Front Flaps -->
+                <svg class="absolute inset-0 w-full h-full z-20 pointer-events-none rounded-2xl" viewBox="0 0 400 260" preserveAspectRatio="none">
+                    <polygon points="0,0 200,145 0,260" fill="#D9ECFA"/>
+                    <polygon points="400,0 200,145 400,260" fill="#C4E1F7"/>
+                    <polygon points="0,260 200,130 400,260" fill="#FFFFFF"/>
+                </svg>
+
+                <!-- Envelope Top Flap -->
+                <div class="envelope-flap absolute top-0 left-0 right-0 h-1/2 z-30 pointer-events-none">
+                    <svg class="w-full h-full drop-shadow-sm" viewBox="0 0 400 130" preserveAspectRatio="none">
+                        <polygon points="0,0 400,0 200,130" fill="#B0D6F5"/>
+                    </svg>
+                </div>
+
+                <!-- Interactive Wax Seal / Button -->
+                <div id="welcome-seal" class="absolute z-40 px-4 py-2 bg-navy-900 text-white rounded-full shadow-lg border-2 border-white flex items-center gap-1.5 animate-pulse-glow">
+                    <svg class="w-3.5 h-3.5 text-softblue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                    <span class="text-xs font-semibold tracking-wide">Buka Amplop</span>
+                </div>
+            </div>
+
+            <p class="mt-5 text-[11px] text-navy-800/60 flex items-center gap-1.5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-softblue-500 animate-ping"></span>
+                <span>Ketuk amplop di atas untuk membuka ucapan</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== 2B. ROMANTIC ENVELOPE POPUP OVERLAY (SAAT AMPLOP DIBUKA) ==================== -->
+    <div id="romantic-popup" class="fixed inset-0 z-40 mx-auto max-w-[430px] hidden opacity-0 transition-all duration-700 flex items-center justify-center px-4 py-6 bg-navy-950/60 backdrop-blur-md">
+        <div id="romantic-card" class="relative w-full bg-white rounded-3xl p-6 shadow-2xl border border-softblue-200 text-center transform scale-95 transition-all duration-700 overflow-hidden">
+            <!-- Top Gradient Accent -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-softblue-300 via-navy-800 to-softblue-300"></div>
+            
+            <!-- Heart & Cap Icon -->
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-softblue-50 border border-softblue-200 flex items-center justify-center text-navy-900 shadow-sm">
+                <svg class="w-6 h-6 text-softblue-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-softblue-500">Selamat Wisuda, Sayang</span>
+            <h2 class="font-serif text-2xl font-bold text-navy-900 mt-0.5 mb-3">
+                Silvi Wulandari, S.M.
+            </h2>
+
+            <div class="space-y-2.5 text-navy-800/90 text-xs leading-relaxed italic font-normal bg-softblue-50/70 p-4 rounded-2xl border border-softblue-100">
+                <p>"Selamat atas gelar Sarjana Manajemen yang akhirnya resmi kamu raih hari ini. Aku tahu persis betapa kerasnya kamu berjuang di balik setiap lembar skripsi, revisi, dan malam-malam panjang yang melelahkan."</p>
+                <p>"Melihatmu tersenyum dengan toga hari ini adalah salah satu momen paling membahagiakan dan membanggakan bagiku. Terima kasih sudah berjuang sejauh ini, aku selalu bangga dan sayang padamu."</p>
+            </div>
+
+            <button onclick="enterMainCelebration()" class="mt-5 w-full py-3 px-5 rounded-full bg-navy-900 text-white font-semibold text-xs shadow-lg shadow-navy-900/20 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <span>Lihat Kenangan & Ucapan Lengkap</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 3. FLOATING NAVIGATION & AUDIO CONTROLS ==================== -->
+    <nav id="top-nav" class="fixed top-3 left-1/2 -translate-x-1/2 z-30 hidden opacity-0 transition-opacity duration-700 w-[92%] max-w-[395px]">
+        <div class="bg-white/85 backdrop-blur-md border border-softblue-200/80 shadow-md shadow-navy-900/5 rounded-full px-4 py-2 flex items-center justify-around text-xs font-medium text-navy-800">
+            <a href="#ucapan" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Ucapan</a>
+            <a href="#surat" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Pesan</a>
+            <a href="#penutup" class="px-3 py-1 rounded-full active:bg-softblue-100 transition-colors">Doa</a>
+        </div>
+    </nav>
+
+    <!-- Floating Music Control Button (Bottom Right inside Mobile Shell) -->
+    <div id="floating-controls" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 hidden opacity-0 transition-opacity duration-700 w-[92%] max-w-[395px] flex items-end justify-between pointer-events-none">
+        <!-- Back to Top Button -->
+        <button id="back-to-top" onclick="scrollToTop()" aria-label="Kembali ke atas" class="pointer-events-auto w-10 h-10 rounded-full bg-white/95 backdrop-blur-md text-navy-900 border border-softblue-200 shadow-md active:scale-95 flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+            </svg>
+        </button>
+
+        <!-- Music Selector & Toggle Pill -->
+        <div class="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md p-1.5 pl-3 rounded-full shadow-lg shadow-navy-900/15 border border-softblue-200 ml-auto">
+            <!-- Info Lagu Asli YouTube -->
+            <div class="flex items-center gap-1.5 text-left pr-0.5">
+                <svg class="w-3.5 h-3.5 text-softblue-500 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+                <div class="leading-tight">
+                    <p id="track-title" class="text-[10px] font-bold text-navy-900">Sampai di Sana</p>
+                    <p id="track-subtitle" class="text-[9px] text-softblue-500 font-medium">Lagu Latar</p>
+                </div>
+            </div>
+
+            <!-- YouTube Player Container (Ukuran memadai namun transparan agar tidak diblokir kebijakan autoplay mobile) -->
+            <div class="fixed bottom-16 right-4 w-[200px] h-[112px] opacity-0 pointer-events-none overflow-hidden -z-10">
+                <div id="youtube-audio-player"></div>
+            </div>
+
+            <!-- Music Toggle Button -->
+            <button id="music-toggle" onclick="toggleMusic()" aria-label="Putar atau Jeda Musik" class="w-9 h-9 rounded-full bg-navy-900 text-white shadow-md flex items-center justify-center transition-all duration-300 active:scale-95 relative shrink-0 cursor-pointer">
+                <span id="music-ping" class="absolute inset-0 rounded-full bg-softblue-400 opacity-30 animate-ping hidden"></span>
+                <svg id="icon-play" class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg id="icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== 4. MAIN CONTENT (HALAMAN UTAMA MOBILE) ==================== -->
+    <main id="main-content" class="hidden opacity-0 transition-opacity duration-1000 pt-16 pb-20">
+
+        <!-- SECTION A: HALAMAN UCAPAN WISUDA (HERO) -->
+        <section id="ucapan" class="relative px-4 pt-3 pb-10">
+            
+            <!-- Decorative Background Ornaments -->
+            <div class="absolute top-2 left-3 text-softblue-300 animate-float pointer-events-none">
+                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+            </div>
+            <div class="absolute bottom-8 right-3 text-softblue-300 animate-float-reverse pointer-events-none">
+                <svg class="w-8 h-8 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="15" r="6"/>
+                    <path d="M8.5 9.5L6 3h12l-2.5 6.5"/>
+                    <path d="M12 12v3l2 1"/>
+                </svg>
+            </div>
+
+            <!-- Main Greeting Card Container -->
+            <div class="bg-white/90 backdrop-blur-lg rounded-3xl p-5 shadow-lg shadow-softblue-200/50 border border-white text-center relative overflow-hidden">
+                
+                <!-- Subtle Top Ribbon Accent -->
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-softblue-200 via-navy-800 to-softblue-200"></div>
+
+                <!-- Header Titles -->
+                <p class="text-[10px] font-bold tracking-[0.22em] uppercase text-softblue-500 mb-1 mt-1">
+                    CONGRATULATIONS!
+                </p>
+                <h2 class="font-serif text-3xl font-bold text-navy-900 tracking-tight mb-4">
+                    Happy Graduation
+                </h2>
+
+                <!-- Decorative Graduation Emblem (Tanpa Foto) -->
+                <div class="relative w-16 h-16 mx-auto mb-4 rounded-full bg-softblue-50 border border-softblue-200 flex items-center justify-center text-navy-900 shadow-sm">
+                    <svg class="w-8 h-8 text-navy-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                </div>
+
+                <!-- Graduate Name & Program Studi -->
+                <div class="mb-4">
+                    <h3 class="font-serif text-2xl font-bold text-navy-900">
+                        Silvi Wulandari, S.M.
+                    </h3>
+                    <p class="text-[11px] font-semibold tracking-widest uppercase text-softblue-500 mt-1">
+                        Program Studi Manajemen • 25 November 2026
+                    </p>
+                </div>
+
+                <!-- Heartfelt Message -->
+                <div class="bg-softblue-50/80 rounded-2xl p-4 border border-softblue-100 text-left">
+                    <p class="text-navy-800/90 text-xs leading-relaxed">
+                        "Selamat atas pencapaian luar biasa ini. Akhirnya, perjalanan panjang yang penuh perjuangan, doa, air mata, dan pengorbanan berhasil kamu lewati. Hari ini bukan sekadar tentang gelar yang berhasil diraih, tetapi tentang proses panjang yang telah membentukmu menjadi pribadi yang lebih kuat dan hebat. Semoga ilmu yang didapat menjadi berkah dan bermanfaat, serta menjadi awal dari perjalanan baru yang jauh lebih indah. Teruslah melangkah, karena masih banyak impian yang menantimu. <span class="font-semibold text-navy-900 italic">We're so proud of you!</span>"
+                    </p>
+                    <p class="text-[11px] font-semibold text-navy-900 text-right mt-2.5">
+                        — Dari Irwansyah • 25 November 2026
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION C: PESAN SPESIAL (AMPLOP DIGITAL INTERAKTIF) -->
+        <section id="surat" class="px-4 py-8 reveal">
+            <div class="text-center mb-6">
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-softblue-500">A Personal Note</span>
+                <h2 class="font-serif text-2xl font-bold text-navy-900 mt-0.5">Pesan Spesial Untukmu</h2>
+                <p id="envelope-hint" class="text-xs text-navy-800/70 mt-1">Ketuk amplop di bawah ini untuk membuka surat</p>
+            </div>
+
+            <!-- Interactive Envelope Container -->
+            <div class="envelope-wrapper relative w-full max-w-[330px] mx-auto pt-4">
+                
+                <!-- Envelope Body -->
+                <div id="envelope-box" onclick="toggleEnvelope()" role="button" tabindex="0" aria-label="Buka atau Tutup Amplop Surat"
+                     class="relative w-full h-44 bg-softblue-200 rounded-2xl shadow-lg shadow-navy-900/10 border border-softblue-300/60 cursor-pointer flex items-center justify-center transition-transform duration-300 active:scale-95">
+                    
+                    <!-- Inner Envelope Back -->
+                    <div class="absolute inset-0 bg-softblue-300/50 rounded-2xl"></div>
+
+                    <!-- Peeking Letter Preview -->
+                    <div class="letter-card relative z-10 w-[88%] h-[82%] bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center text-center border border-softblue-100">
+                        <p class="font-serif italic text-navy-900 text-base">Untukmu, Silvi Wulandari, S.M.</p>
+                        <p class="text-[11px] text-navy-800/60 mt-1">Sebuah catatan kecil dari hati...</p>
+                    </div>
+
+                    <!-- Envelope Front Left & Right Flaps -->
+                    <svg class="absolute inset-0 w-full h-full z-20 pointer-events-none rounded-2xl" viewBox="0 0 400 240" preserveAspectRatio="none">
+                        <polygon points="0,0 200,130 0,240" fill="#DCEEFB"/>
+                        <polygon points="400,0 200,130 400,240" fill="#CFE6F9"/>
+                        <polygon points="0,240 200,120 400,240" fill="#FFFFFF"/>
+                    </svg>
+
+                    <!-- Envelope Top Flap -->
+                    <div class="envelope-flap absolute top-0 left-0 right-0 h-1/2 z-30 pointer-events-none">
+                        <svg class="w-full h-full drop-shadow-sm" viewBox="0 0 400 120" preserveAspectRatio="none">
+                            <polygon points="0,0 400,0 200,120" fill="#B8DCF8"/>
+                        </svg>
+                    </div>
+
+                    <!-- Wax Seal Button -->
+                    <div id="wax-seal" class="absolute z-40 w-12 h-12 rounded-full bg-navy-900 text-white flex items-center justify-center shadow-lg border-2 border-softblue-200 transition-transform duration-300">
+                        <svg class="w-5 h-5 text-softblue-200" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Expanded Full Letter Modal/Card -->
+                <div id="full-letter" class="hidden opacity-0 translate-y-6 transition-all duration-700 mt-5 bg-white rounded-3xl p-5 shadow-xl shadow-navy-900/10 border border-softblue-200 relative">
+                    <div class="flex items-center justify-between border-b border-softblue-100 pb-3 mb-3">
+                        <span class="font-serif italic text-base text-navy-900 font-semibold">Dear Silvi Wulandari, S.M.</span>
+                        <button onclick="toggleEnvelope()" class="text-[11px] font-medium text-softblue-500 active:text-navy-900 px-2.5 py-1 rounded-full bg-softblue-50">
+                            Tutup Surat
+                        </button>
+                    </div>
+                    <div class="space-y-3 text-navy-800/90 text-xs leading-relaxed">
+                        <p>
+                            Jika suatu hari nanti kamu merasa lelah dengan langkah yang sedang kamu tempuh, ingatlah kembali hari ini—hari di mana kamu membuktikan bahwa tidak ada usaha yang mengkhianati hasil.
+                        </p>
+                        <p>
+                            Begitu banyak malam yang kamu habiskan untuk bertahan, begitu banyak keraguan yang berhasil kamu kalahkan dengan doa dan ketekunan selama menyusun skripsi. Kamu layak mendapatkan segala kebahagiaan dan apresiasi atas pencapaian gelar Sarjana Manajemen ini.
+                        </p>
+                        <p>
+                            Semoga babak baru kehidupanmu setelah wisuda ini selalu dipenuhi pintu-pintu kesempatan yang baik, orang-orang yang tulus menyayangimu, dan kebahagiaan yang tidak pernah putus.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-softblue-100 text-right">
+                        <p class="font-serif italic text-navy-900 text-sm">Dengan penuh rasa bangga & sayang,</p>
+                        <p class="text-xs font-semibold text-navy-900 mt-0.5">Dari Irwansyah</p>
+                        <p class="text-[11px] font-medium text-softblue-500 mt-0.5">25 November 2026</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION D: BAGIAN PENUTUP -->
+        <footer id="penutup" class="px-4 pt-8 pb-6 text-center reveal relative">
+            <div class="bg-gradient-to-b from-white to-softblue-100/80 rounded-3xl p-6 shadow-md border border-white relative overflow-hidden">
+                
+                <!-- Twinkling Stars -->
+                <div class="flex justify-center items-center gap-3 mb-3 text-softblue-400">
+                    <svg class="w-4 h-4 animate-sparkle" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                    <svg class="w-6 h-6 text-navy-800 animate-sparkle" style="animation-delay: 0.6s;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                    <svg class="w-4 h-4 animate-sparkle" style="animation-delay: 1.2s;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                </div>
+
+                <h2 class="font-serif text-2xl font-bold text-navy-900 leading-snug mb-3">
+                    Once Again, Congratulations on Your Graduation!
+                </h2>
+
+                <p class="text-navy-800/85 text-xs leading-relaxed mb-5">
+                    "Semoga setiap langkah ke depan selalu dipenuhi keberkahan, kebahagiaan, dan keberhasilan. <span class="italic font-serif text-sm text-navy-900">This is just the beginning of your beautiful journey.</span>"
+                </p>
+
+                <!-- Replay Confetti Button -->
+                <button onclick="fireCelebrationConfetti()" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-navy-900 text-xs font-medium border border-softblue-200 shadow-sm active:scale-95 transition-all mb-6 cursor-pointer">
+                    <span>Rayakan Lagi</span>
+                    <svg class="w-3.5 h-3.5 text-softblue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    </svg>
+                </button>
+
+                <div class="border-t border-softblue-200/60 pt-4">
+                    <p class="text-[11px] font-medium tracking-wider text-navy-800/60 flex items-center justify-center gap-1.5">
+                        <span>Made with Love</span>
+                        <svg class="w-3 h-3 text-softblue-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    </div> <!-- End of #mobile-app-shell -->
+
+    <!-- ==================== 6. JAVASCRIPT INTERACTIVITY ==================== -->
+    <script>
+        // --- 1. LOADER INITIALIZATION ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                loader.classList.add('opacity-0');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 700);
+            }, 600);
+        });
+
+        // --- 2. BACKGROUND MUSIC (YOUTUBE ORIGINAL AUDIO: https://youtu.be/ugk5pd9xgSw) ---
+        const YOUTUBE_VIDEO_ID = 'ugk5pd9xgSw';
+        let ytPlayer = null;
+        let isYtReady = false;
+        let isMusicPlaying = false;
+        let hasUserInteracted = false;
+
+        // Callback otomatis dari YouTube IFrame API
+        function createYouTubePlayer() {
+            if (ytPlayer || typeof YT === 'undefined' || !YT.Player) return;
+            ytPlayer = new YT.Player('youtube-audio-player', {
+                height: '112',
+                width: '200',
+                videoId: YOUTUBE_VIDEO_ID,
+                playerVars: {
+                    autoplay: 1,
+                    mute: 1,
+                    controls: 0,
+                    disablekb: 1,
+                    fs: 0,
+                    iv_load_policy: 3,
+                    loop: 1,
+                    playlist: YOUTUBE_VIDEO_ID,
+                    modestbranding: 1,
+                    playsinline: 1,
+                    rel: 0
+                },
+                events: {
+                    onReady: function(event) {
+                        isYtReady = true;
+                        // Mulai buffer/putar video segera setelah halaman dimuat
+                        event.target.playVideo();
+                        // Coba langsung unmute jika browser mengizinkan
+                        setTimeout(() => {
+                            try {
+                                event.target.unMute();
+                                event.target.setVolume(100);
+                                if (event.target.isMuted()) {
+                                    // Jika browser menahan suara sebelum sentuhan, buka kunci pada sentuhan pertama
+                                    isMusicPlaying = false;
+                                } else {
+                                    isMusicPlaying = true;
+                                }
+                                updateMusicUI();
+                            } catch (e) {}
+                        }, 300);
+                    },
+                    onStateChange: function(event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            if (!event.target.isMuted()) {
+                                isMusicPlaying = true;
+                            }
+                            updateMusicUI();
+                        } else if (event.data === YT.PlayerState.PAUSED) {
+                            isMusicPlaying = false;
+                            updateMusicUI();
+                        } else if (event.data === YT.PlayerState.ENDED) {
+                            event.target.seekTo(0);
+                            event.target.playVideo();
+                        }
+                    },
+                    onError: function() {
+                        document.getElementById('track-subtitle').textContent = 'Ketuk tombol play';
+                    }
+                }
+            });
+        }
+
+        window.onYouTubeIframeAPIReady = function() {
+            createYouTubePlayer();
+        };
+
+        if (typeof YT !== 'undefined' && YT.Player) {
+            createYouTubePlayer();
+        }
+
+        function initAndPlayMusic() {
+            hasUserInteracted = true;
+            createYouTubePlayer();
+            if (isYtReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                ytPlayer.unMute();
+                ytPlayer.setVolume(100);
+                ytPlayer.playVideo();
+                isMusicPlaying = true;
+                updateMusicUI();
+            }
+        }
+
+        // Otomatis nyalakan suara pada sentuhan/klik pertama di mana saja pada layar HP
+        ['touchstart', 'click'].forEach(evt => {
+            document.addEventListener(evt, function unlockAudioOnFirstGesture() {
+                if (!hasUserInteracted) {
+                    initAndPlayMusic();
+                }
+            }, { once: true, passive: true });
+        });
+
+        function toggleMusic() {
+            hasUserInteracted = true;
+            if (!isYtReady || !ytPlayer) {
+                createYouTubePlayer();
+                return;
+            }
+
+            if (!isMusicPlaying || ytPlayer.isMuted()) {
+                ytPlayer.unMute();
+                ytPlayer.setVolume(100);
+                ytPlayer.playVideo();
+                isMusicPlaying = true;
+            } else {
+                ytPlayer.pauseVideo();
+                isMusicPlaying = false;
+            }
+            updateMusicUI();
+        }
+
+        function updateMusicUI() {
+            const iconPlay = document.getElementById('icon-play');
+            const iconPause = document.getElementById('icon-pause');
+            const musicPing = document.getElementById('music-ping');
+
+            if (isMusicPlaying) {
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+                musicPing.classList.remove('hidden');
+            } else {
+                iconPlay.classList.remove('hidden');
+                iconPause.classList.add('hidden');
+                musicPing.classList.add('hidden');
+            }
+        }
+
+        // --- 3. CONFETTI CELEBRATION ---
+        function fireCelebrationConfetti() {
+            if (typeof confetti === 'undefined') return;
+            
+            const colors = ['#0F2542', '#4A96D4', '#A3CEEE', '#FFFFFF', '#F59E0B'];
+            
+            confetti({
+                particleCount: 75,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: colors
+            });
+
+            setTimeout(() => {
+                confetti({
+                    particleCount: 45,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0.1, y: 0.65 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 45,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 0.9, y: 0.65 },
+                    colors: colors
+                });
+            }, 250);
+        }
+
+        // --- 4. TRANSITION FROM WELCOME ENVELOPE -> ROMANTIC GREETING POPUP -> MAIN CONTENT ---
+        let isGreetingOpened = false;
+        function openGreeting() {
+            if (isGreetingOpened) return;
+            isGreetingOpened = true;
+
+            // Mulai musik latar setelah interaksi klik pengguna
+            initAndPlayMusic();
+
+            const welcomeEnvelope = document.getElementById('welcome-envelope');
+            const welcomeSeal = document.getElementById('welcome-seal');
+            const romanticPopup = document.getElementById('romantic-popup');
+            const romanticCard = document.getElementById('romantic-card');
+            const floatingControls = document.getElementById('floating-controls');
+
+            // 1. Animasi membuka tutup amplop terlebih dahulu
+            welcomeEnvelope.classList.add('envelope-open');
+            welcomeSeal.classList.add('opacity-0', 'scale-50');
+
+            // 2. Tampilkan kartu ucapan romantis & tombol ganti lagu setelah amplop terbuka
+            setTimeout(() => {
+                romanticPopup.classList.remove('hidden');
+                floatingControls.classList.remove('hidden');
+
+                setTimeout(() => {
+                    romanticPopup.classList.remove('opacity-0');
+                    romanticCard.classList.remove('scale-95');
+                    romanticCard.classList.add('scale-100');
+                    floatingControls.classList.remove('opacity-0');
+                    fireCelebrationConfetti();
+                }, 40);
+            }, 650);
+        }
+
+        function enterMainCelebration() {
+            initAndPlayMusic();
+
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const romanticPopup = document.getElementById('romantic-popup');
+            const mainContent = document.getElementById('main-content');
+            const topNav = document.getElementById('top-nav');
+
+            romanticPopup.classList.add('opacity-0');
+            welcomeScreen.classList.add('opacity-0', '-translate-y-6');
+
+            setTimeout(() => {
+                romanticPopup.classList.add('hidden');
+                welcomeScreen.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                topNav.classList.remove('hidden');
+
+                setTimeout(() => {
+                    mainContent.classList.remove('opacity-0');
+                    topNav.classList.remove('opacity-0');
+                    fireCelebrationConfetti();
+                    checkReveal();
+                }, 50);
+            }, 600);
+        }
+
+        // --- 5. INTERACTIVE PERSONAL LETTER ENVELOPE ---
+        let isEnvelopeOpen = false;
+        function toggleEnvelope() {
+            const box = document.getElementById('envelope-box');
+            const letter = document.getElementById('full-letter');
+            const hint = document.getElementById('envelope-hint');
+            const seal = document.getElementById('wax-seal');
+
+            isEnvelopeOpen = !isEnvelopeOpen;
+
+            if (isEnvelopeOpen) {
+                box.classList.add('envelope-open');
+                seal.classList.add('scale-0', 'opacity-0');
+                hint.textContent = 'Surat terbuka — Selamat membaca!';
+
+                letter.classList.remove('hidden');
+                setTimeout(() => {
+                    letter.classList.remove('opacity-0', 'translate-y-6');
+                    letter.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 250);
+            } else {
+                box.classList.remove('envelope-open');
+                seal.classList.remove('scale-0', 'opacity-0');
+                hint.textContent = 'Ketuk amplop di bawah ini untuk membuka surat';
+
+                letter.classList.add('opacity-0', 'translate-y-6');
+                setTimeout(() => {
+                    letter.classList.add('hidden');
+                }, 500);
+            }
+        }
+
+        // --- 6. SCROLL REVEAL & BACK TO TOP ---
+        function checkReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            const windowHeight = window.innerHeight;
+
+            reveals.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 80) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Back to top button visibility
+            const backToTopBtn = document.getElementById('back-to-top');
+            if (window.scrollY > 350) {
+                backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        window.addEventListener('scroll', checkReveal);
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 8. PROTEKSI ANTI-ZOOM & ANTI-COPY UNTUK PENGALAMAN APLIKASI MOBILE YANG HALUS ---
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function (e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 'u', 's', '+', '-', '='].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
